@@ -4,15 +4,16 @@ buildscript {
     repositories {
         jcenter()
         maven {
-            url 'https://maven.google.com/'
+            url 'https://dl.google.com/dl/android/maven2/'
             name 'Google'
         }
         maven {
             url 'https://maven.fabric.io/public'
         }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.android.tools.build:gradle-experimental:0.11.0'
         // We recommend changing it to the latest version from our changelog:
         // https://docs.fabric.io/android/changelog.html#fabric-gradle-plugin
@@ -29,7 +30,7 @@ allprojects {
             url "https://jitpack.io"
         }
         maven {
-            url 'https://maven.google.com/'
+            url 'https://dl.google.com/dl/android/maven2/'
             name 'Google'
         }
         jcenter()
