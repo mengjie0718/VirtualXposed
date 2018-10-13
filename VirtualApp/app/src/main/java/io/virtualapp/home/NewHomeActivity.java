@@ -49,7 +49,6 @@ import java.lang.reflect.Method;
 import io.virtualapp.R;
 import io.virtualapp.abs.ui.VUiKit;
 import io.virtualapp.settings.SettingsActivity;
-import io.virtualapp.update.VAVersionService;
 
 import static io.virtualapp.XApp.XPOSED_INSTALLER_PACKAGE;
 
@@ -61,7 +60,6 @@ import static io.virtualapp.XApp.XPOSED_INSTALLER_PACKAGE;
 public class NewHomeActivity extends NexusLauncherActivity {
 
     private static final String SHOW_DOZE_ALERT_KEY = "SHOW_DOZE_ALERT_KEY";
-    private static final String WALLPAPER_FILE_NAME = "wallpaper.png";
 
     private Handler mUiHandler;
     private boolean mDirectlyBack = false;
@@ -80,10 +78,8 @@ public class NewHomeActivity extends NexusLauncherActivity {
         super.onCreate(savedInstanceState);
         showMenuKey();
         mUiHandler = new Handler(getMainLooper());
-        alertForMeizu();
         alertForDoze();
         mDirectlyBack = sharedPreferences.getBoolean(SettingsActivity.DIRECTLY_BACK_KEY, false);
-        alertForExp();
     }
 
     private void installXposed() {
@@ -164,9 +160,7 @@ public class NewHomeActivity extends NexusLauncherActivity {
             checkXposedInstaller = false;
             installXposed();
         }
-        // check for update
-        new Handler().postDelayed(() ->
-                VAVersionService.checkUpdate(getApplicationContext(), false), 1000);
+
 
         // check for wallpaper
         setWallpaper();
@@ -238,82 +232,14 @@ public class NewHomeActivity extends NexusLauncherActivity {
         }
     }
 
-    private void alertForMeizu() {
-        if (!DeviceUtil.isMeizuBelowN()) {
-            return;
-        }
-        boolean isXposedInstalled = VirtualCore.get().isAppInstalled(XPOSED_INSTALLER_PACKAGE);
-        if (isXposedInstalled) {
-            return;
-        }
-        mUiHandler.postDelayed(() -> {
-            AlertDialog alertDialog = new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.meizu_device_tips_title)
-                    .setMessage(R.string.meizu_device_tips_content)
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    })
-                    .create();
-            try {
-                alertDialog.show();
-            } catch (Throwable ignored) {
-            }
-        }, 2000);
-    }
+
 
     protected int dp2px(float dp) {
         final float scale = getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
 
-    private void alertForExp() {
-        final String shown = "_exp_has_alert";
-        boolean aBoolean = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(shown, false);
-        if (aBoolean) {
-            return;
-        }
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-
-        int _20dp = dp2px(20);
-        layout.setPadding(_20dp, _20dp, _20dp, _20dp);
-
-        TextView tv = new TextView(this);
-        tv.setTextColor(Color.BLACK);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        tv.setText(R.string.exp_tips);
-        layout.addView(tv);
-
-        CheckBox checkBox = new CheckBox(this);
-        checkBox.setText("不再提示");
-        checkBox.setOnClickListener(v -> {
-            if (checkBox.isChecked()) {
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putBoolean(shown, true).apply();
-            }
-        });
-
-        layout.addView(checkBox);
-        mUiHandler.postDelayed(() -> {
-            AlertDialog alertDialog = new AlertDialog.Builder(getContext())
-                    .setTitle("关于新项目EXP的说明")
-                    .setView(layout)
-                    .setPositiveButton("查看详情说明", (dialog, which) -> {
-                        Intent t = new Intent(Intent.ACTION_VIEW);
-                        t.setData(Uri.parse("https://vxposed.com/exp.html"));
-                        startActivity(t);
-                    }).setNegativeButton("支持我", (dialog, which) -> {
-                        Intent t = new Intent(Intent.ACTION_VIEW);
-                        t.setData(Uri.parse("https://vxposed.com/donate.html"));
-                        startActivity(t);
-                    })
-                    .create();
-            try {
-                alertDialog.show();
-
-            } catch (Throwable ignored) {
-            }
-        }, 2000);
-    }
 
     private void alertForDoze() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -365,28 +291,7 @@ public class NewHomeActivity extends NexusLauncherActivity {
     }
 
     private void setWallpaper() {
-        File wallpaper = getFileStreamPath(WALLPAPER_FILE_NAME);
-        if (wallpaper == null || !wallpaper.exists() || wallpaper.isDirectory()) {
-            setOurWallpaper(getResources().getDrawable(R.drawable.home_bg));
-        } else {
-            long start = SystemClock.elapsedRealtime();
-            Drawable d;
-            try {
-                d = BitmapDrawable.createFromPath(wallpaper.getPath());
-            } catch (Throwable e) {
-                Toast.makeText(getApplicationContext(), R.string.wallpaper_too_big_tips, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            long cost = SystemClock.elapsedRealtime() - start;
-            if (cost > 200) {
-                Toast.makeText(getApplicationContext(), R.string.wallpaper_too_big_tips, Toast.LENGTH_SHORT).show();
-            }
-            if (d == null) {
-                setOurWallpaper(getResources().getDrawable(R.drawable.home_bg));
-            } else {
-                setOurWallpaper(d);
-            }
-        }
+        setOurWallpaper(getResources().getDrawable(R.drawable.home_bg));
     }
 
     private void showMenuKey() {

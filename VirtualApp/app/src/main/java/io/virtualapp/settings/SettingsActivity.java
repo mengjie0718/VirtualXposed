@@ -40,9 +40,7 @@ public class SettingsActivity extends Activity {
     private static final String APP_MANAGE_KEY = "settings_app_manage";
     private static final String TASK_MANAGE_KEY = "settings_task_manage";
     private static final String DESKTOP_SETTINGS_KEY = "settings_desktop";
-    private static final String FAQ_SETTINGS_KEY = "settings_faq";
-    private static final String DONATE_KEY = "settings_donate";
-    private static final String ABOUT_KEY = "settings_about";
+
     private static final String REBOOT_KEY = "settings_reboot";
     private static final String HIDE_SETTINGS_KEY = "advance_settings_hide_settings";
     private static final String DISABLE_INSTALLER_KEY = "advance_settings_disable_installer";
@@ -88,9 +86,7 @@ public class SettingsActivity extends Activity {
             Preference appManage = findPreference(APP_MANAGE_KEY);
             Preference taskManage = findPreference(TASK_MANAGE_KEY);
             Preference desktop = findPreference(DESKTOP_SETTINGS_KEY);
-            Preference faq = findPreference(FAQ_SETTINGS_KEY);
-            Preference donate = findPreference(DONATE_KEY);
-            Preference about = findPreference(ABOUT_KEY);
+
             Preference reboot = findPreference(REBOOT_KEY);
             Preference fileMange = findPreference(FILE_MANAGE);
             Preference permissionManage = findPreference(PERMISSION_MANAGE);
@@ -137,82 +133,14 @@ public class SettingsActivity extends Activity {
                 return false;
             });
 
-            faq.setOnPreferenceClickListener(preference -> {
-                Uri uri = Uri.parse("https://github.com/android-hacker/VAExposed/wiki/FAQ");
-                Intent t = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(t);
-                return false;
-            });
+
 
             desktop.setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(getActivity(), com.google.android.apps.nexuslauncher.SettingsActivity.class));
                 return false;
             });
 
-            donate.setOnPreferenceClickListener(preference -> {
-                AlertDialog alertDialog = new AlertDialog.Builder(getActivity(), R.style.Theme_AppCompat_DayNight_Dialog_Alert)
-                        .setTitle(R.string.donate_dialog_title)
-                        .setMessage(R.string.donate_dialog_content)
-                        .setPositiveButton(R.string.donate_dialog_yes, (dialog, which) -> {
-                            // show chooser dialog
 
-                            final String alipay = getResources().getString(R.string.donate_alipay);
-                            final String[] items = {alipay, "Paypal", "Bitcoin"};
-
-                            AlertDialog chooseDialog = new AlertDialog.Builder(getActivity(), R.style.Theme_AppCompat_DayNight_Dialog_Alert)
-                                    .setTitle(R.string.donate_choose_title)
-                                    .setItems(items, (dialog1, which1) -> {
-                                        dialog1.dismiss();
-                                        if (which1 == 0) {
-                                            if (!AlipayZeroSdk.hasInstalledAlipayClient(getActivity())) {
-                                                Toast.makeText(getActivity(), R.string.prompt_alipay_not_found, Toast.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                            AlipayZeroSdk.startAlipayClient(getActivity(), "FKX016770URBZGZSR37U37");
-                                        } else if (which1 == 1) {
-                                            try {
-                                                Intent t = new Intent(Intent.ACTION_VIEW);
-                                                t.setData(Uri.parse("https://paypal.me/virtualxposed"));
-                                                startActivity(t);
-                                            } catch (Throwable ignored) {
-                                                ignored.printStackTrace();
-                                            }
-                                        } else if (which1 == 2) {
-                                            final String address = "39Wst8oL74pRP2vKPkPihH6RFQF4hWoBqU";
-
-                                            try {
-                                                ClipboardManager clipboardManager = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
-                                                if (clipboardManager != null) {
-                                                    clipboardManager.setPrimaryClip(ClipData.newPlainText(null, address));
-                                                }
-                                                Toast.makeText(getActivity(), getResources().getString(R.string.donate_bitconins_tips), Toast.LENGTH_SHORT).show();
-                                            } catch (Throwable ignored) {
-                                                ignored.printStackTrace();
-                                            }
-                                        }
-                                    })
-                                    .create();
-                            chooseDialog.show();
-                        })
-                        .setNegativeButton(R.string.donate_dialog_no, ((dialog, which) -> {
-                            Intent intent = new Intent();
-                            intent.setAction(Intent.ACTION_VIEW);
-                            intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                            intent.setData(Uri.parse("https://github.com/android-hacker/VirtualXposed"));
-                            startActivity(intent);
-                        }))
-                        .create();
-                try {
-                    alertDialog.show();
-                } catch (Throwable ignored) {
-                    // BadTokenException.
-                }
-                return false;
-            });
-            about.setOnPreferenceClickListener(preference -> {
-                startActivity(new Intent(getActivity(), AboutActivity.class));
-                return false;
-            });
 
             reboot.setOnPreferenceClickListener(preference -> {
                 android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(getActivity())
